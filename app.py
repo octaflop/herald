@@ -10,9 +10,32 @@ r = redis.Redis()
 def static_file(filename):
     send_file(filename, root='/static/')
 
+#Dynamic Shit
 @route('/')
 def index():
+    """Returns the index with the 10 latest posts"""
     return dict(title=title, menu=menu, posts=posts)
+
+@route('/post/:postid')
+@route('/:year/:month/:day/:postid')
+def post(year=0, month=0, day=0, postid):
+    """Returns a single post. Date is optional"""
+    return dict(title=title, content=content, date=date)
+
+@route('/:year/:month/:day/')
+def post(year, month, day)
+    """Returns all posts for a given day"""
+    return dict(title=title, content=content, date=date)
+
+@route('/:year/:month/')
+def post(year, month):
+    """Returns all posts for a given month"""
+    return dict(title=title, content=content, date=date)
+
+@route('/:year/')
+def post(year):
+    """Returns all posts for a given year"""
+    return dict(title=title, content=content, date=date)
 
 if __name__ == "__main__":
     import bottle
