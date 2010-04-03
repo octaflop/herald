@@ -1,29 +1,34 @@
 from bottle import run, route, view, send_file, debug, template, validate, request, post
 import redis
 import bottle
+import os
 
 #redis referent
 r = redis.Redis()
 
 #static routing for css and js
-@route('/static/:filename')
+@route('/static/:filename#.*#')
 def static_file(filename):
-    send_file(filename, root='/static/')
+    send_file(filename, root=os.getcwd() + '/static')
 
 #Dynamic Shit
 @route('/')
+@view('home.tpl')
 def index():
     """Returns the index with the 10 latest posts"""
+    title = "test"
+    menu = "menu"
+    posts = "poster"
     return dict(title=title, menu=menu, posts=posts)
 
 @route('/post/:postid')
 @route('/:year/:month/:day/:postid')
-def post(year=0, month=0, day=0, postid):
+def post(postid, year=0, month=0, day=0):
     """Returns a single post. Date is optional"""
     return dict(title=title, content=content, date=date)
 
 @route('/:year/:month/:day/')
-def post(year, month, day)
+def post(year, month, day):
     """Returns all posts for a given day"""
     return dict(title=title, content=content, date=date)
 
