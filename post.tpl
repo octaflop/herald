@@ -12,13 +12,16 @@
 </head>
 <body>
 <div class="container">
-	<div class="span-24">
+	<div class="span-24 last">
 		<h1>Herald!</h1>
-		<p>{{menu}}</p>
-		<p>{{maxr}}</p>
 	</div>
-	% for post in posts:
-	<p>{{post}}</p>
-	% endfor
+	<div class="span-18">
+	<h1>{{title}}</h1>
+	<p>{{content}}</p>
+	<pre>{{pid}}</pre>
+	</div>
+	<div class='span-6 last'>
+		<h5>Login</h5>	
+	</div>
 </div>
 </body>
