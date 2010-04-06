@@ -18,7 +18,7 @@
 	<div class="span-18">
 	<h1>{{title}}</h1>
 	<p>{{content}}</p>
-	<pre>{{pid}}</pre>
+	<pre>id:{{pid}}</pre>
 	</div>
 	<div class='span-6 last'>
 		<h5>Login</h5>	
