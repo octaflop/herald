@@ -32,6 +32,10 @@ SID = 1
 def static_file(filename):
     send_file(filename, root=os.getcwd() + '/static')
 
+@route('/favicon.ico')
+def favicon():
+    send_file('favicon.ico', root=os.getcwd() + '/static')
+
 #Dynamic Shit
 @route('/')
 @view('home.tpl')
