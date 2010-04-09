@@ -14,11 +14,10 @@
 <div class="container">
 	<div class="span-24 last">
 		<h1>Herald!</h1>
-		<p>maxr: {{maxr}}</p>
 	</div>
 	<div class="span-18">
 	% for post in posts:
-		<p class='post'>{{post}}</p>
+		<p class='post'><a href="{{post[1]}}">{{post[0]}}</a></p>
 	% end
 	</div>
 	<div class="span-6 last">

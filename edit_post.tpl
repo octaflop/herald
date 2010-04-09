@@ -16,12 +16,11 @@
 		<h1>Herald!</h1>
 	</div>
 	<div class="span-18">
-	<h2>Add new post, id:{{id}}</h2>
+	<h2>Add new post</h2>
 	<form action='/post/do' method='POST'>
-	<span style="visibility:hidden"><input type='text' name='id' value='{{id}}' /></span>
-	<b>Title:</b><input type='text' name='title' />
-	<b>Content:</b><textarea name='content'></textarea>
-	<b>Date:</b><input type='text' name='timestamp' value='{{timestamp}}' />
+	<b>Title:</b><input type='text' name='title' /><br />
+	<b>Content:</b><textarea name='content'></textarea><br />
+	<b>Date:</b><input type='text' name='timestamp' value='{{timestamp}}' /><br />
 	<input type='submit' name='save' value='save' />
 	</form>
 	</div>
