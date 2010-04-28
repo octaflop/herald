@@ -9,18 +9,17 @@ __license__ = 'BSD'
 from bottle import run, route, view, send_file, debug, template, validate,\
 request, post, response, redirect, abort
 import redis, bottle, os, datetime, htmlentitydefs, re, hashlib
+from beaker.middleware import SessionMiddleware
+from bottle import CherryPyServer
 
-def slugfy(text, separator='-'):
-  ret = ""
-  for c in text.lower():
-    try:
-      ret += htmlentitydefs.codepoint2name[ord(c)]
-    except:
-      ret += c
-  ret = re.sub("([a-zA-Z])(uml|acute|grave|circ|tilde|cedil)", r"\1", ret)
-  ret = re.sub("\W", " ", ret)
-  ret = re.sub(" +", separator, ret)
-  return ret.strip()
+# from bottle faq
+session_opts = {
+    'session.type': 'file',
+    'session.cookies_expires': 300,
+    'session.data_dir': './cache',
+    'session.auto': True
+    }
+
 
 #redis referent
 r = redis.Redis()
@@ -164,4 +163,4 @@ def post(year):
 
 if __name__ == "__main__":
     bottle.debug(True)
-    bottle.run(host="0.0.0.0", port=8080)
+    bottle.run(host="0.0.0.0", port=8080, server=CherryPyServer)
