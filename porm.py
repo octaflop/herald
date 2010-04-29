@@ -20,6 +20,8 @@ from settings import R
 R = redis.Redis()
 # Increment ids
 POSTINCR = "document:id"
+# Rank Reference
+RANKREF = "rnk"
 
 # Global Methods
 def unique(uid):
@@ -89,54 +91,76 @@ class Index(object):
 DEXREF = "_alpha_"
 TYPELST = "global:types"
 
+# GRAPHS
+"""
+We define some related sorts of values.
+<list> ==> <kind>[:<pid>[:<attribute>]]
+<kind>:<pid>:<attribute>
+
+
+
+"""
+
 # Main models
 class Document(object):
     """
     The most abstract of models, the document has key features for every post
     """
     def __init__(self, kind=None):
-            self.pid = R.incr(POSTINCR)
-            self.creation = datetime.datetime.now()
-            self.published = False
-            if not isinstance(kind, str):
-                self.kind = "_document" # abstract for <document>:<id>:<attribute>
-            else:
-                self.kind = kind
+        self.pid = R.incr(POSTINCR)
+        self.creation = datetime.datetime.now()
+        self.published = False
+        self.rank = 1
+        if not isinstance(kind, str):
+            self.kind = "_document" # abstract for <kind>:<pid>:<attribute>
+        else:
+            self.kind = kind
 
     def post(self, container=None):
         """
         Metadata
         """
-        self.incr = R.get(POSTINCR)
         self.uid = uuid.uuid1()
         assert unique(self.uid)
-        self.createtime = str(datetime.datetime.now())
-        R.sadd(TYPELST, self.kind)
-        R.setnx("%s:%s:uid" % (self.kind, self.incr), self.uid)
-        R.setnx("%s:%s" % (self.kind, self.uid), self.incr)
-        R.setnx("%s:%s:publishtime" % (self.kind, self.incr), self.createtime)
+        self.atrs = {'uid': uuid.uuid1(),
+                self.incr: R.get(POSTINCR),
+                'kind': self.kind,
+                'publishtime': datetime.datetime.now()}
+        for key in self.atrs.keys():
+            R.setnx("%s:%s:%s" % (self.kind, self.incr, key), self.atrs[key])
         # stuff forgetting, errr, for getting.
         R.sadd(DEXREF, self.uid) # Global reference
-        if not isinstance(container, str):
+        R.sadd(TYPELST, self.kind)
+        # add to container
+        if not isinstance(container, str) and not container==None:
             container = "_meta"
-        else:
-            R.rpush(container, "%s:%s" % (self.kind, self.incr))
+        R.rpush(container, "%s:%s" % (self.kind, self.incr))
+        R.rpush(RANKREF, "%s:%s" % (self.kind, self.incr))
+        R.zadd("%s:%s" % (RANKREF, self.kind), "%s:%s" % (self.kind,\
+                self.incr), self.rank)
         R.rpush("global:docs", "%s:%s" % (self.incr, self.uid))
+        return True
 
-    def put(self, pid, **kwargs):
+    def put(self, pid=None, uid=None, **kwargs):
         """
         Edit a post. Takes a uid or id
         This is a wee bit messy?
         """
         self.pid, self.uid = key(pid, self.kind)
         # this is likely unsafe, but seems to be a good start
-        for key in kwargs.keys():
-            R.set("%s:%s:%s" % (self.kind, self.pid, key))
-        modtime = str(datetime.datetime.now())
+        for atr in kwargs.keys():
+            R.set("%s:%s:%s" % (self.kind, self.pid, atr), kwargs[atr])
+        modtime = datetime.datetime.now()
         R.rpush("%s:%s:modified" % (self.kind, self.pid), modtime)
         return True
 
-    def get(self):
+    def __get__(self, pid=self.pid):
+        """
+        Cool
+        """
+        getone(pid=pid)
+
+    def getall(self):
         """
         return kwargs
         this is where things get tricky...
@@ -149,6 +173,16 @@ class Document(object):
             got.append(R.get("%s:%s" % (kind, pid)))
             got.append(R.get("%s:%s:publishtime" % (kind, pid)))
         return str(got)
+
+    def getone(self, pid=None, uid=None):
+        if pid=None and uid=None:
+            raise ValueError("Need a uid or pid")
+        elif isinstance(pid, int):
+            pid, uid = key(pid, kind=self.kind)
+        elif is instance(uid, kind=self.kind):
+            pid, uid = key(uid, kind=self.kind)
+        got = {}
+        return NotImplementedError("haven't implemented this yet") # TODO
 
 #    def query TODO
 
