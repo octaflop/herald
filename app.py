@@ -3,7 +3,7 @@
 Herald is a blogging app with a redis backend.
 """
 __author__ = 'Faris Chebib'
-__version__ = '0.0.1'
+__version__ = '0.0.3'
 __license__ = 'BSD'
 
 from bottle import run, route, view, send_file, debug, template, validate,\
